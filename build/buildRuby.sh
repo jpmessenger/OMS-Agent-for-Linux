@@ -226,6 +226,26 @@ bundle exec rake build
 elevate ${RUBY_DESTDIR}/bin/gem install pkg/fluentd-0.12.40.gem
 
 echo "========================= Performing Stripping Binaries"
+
+RUBY_WITH_JEMALLOC_CONF=`echo "${RUBY_CONFIGURE_QUALS[@]}" | sed "s/ /\n/g" | grep -- "jemalloc"`
+if [[ $RUBY_WITH_JEMALLOC_CONF == *"jemalloc"* ]]; then
+    echo "=========================== Copying JEMALLOC to ruby lib directory"
+    DISTRO=`lsb_release -i | cut -d : -f 2 | sed 's/\t//g'`
+    RPM_CMD="rpm -ql jemalloc"
+    case $DISTRO in
+        Ubuntu | Debian)
+          RPM_CMD="dpkg -L libjemalloc-dev"
+          ;;
+        CentOS | Redhat)
+            RPM_CMD="rpm -ql jemalloc"
+            echo "RPM_CMD=$RPM_CMD"
+            LIB_JEMALLOC_FILES=`$RPM_CMD | grep 'so' | grep '64'`
+            echo "LIB_JEMALLOC_FILES=$LIB_JEMALLOC_FILES"
+            sudo cp $LIB_JEMALLOC_FILES  ${RUBY_DESTDIR}/lib/libjemalloc.so.1
+          ;;
+      esac
+fi
+
 sudo find ${RUBY_DESTDIR} -name \*.so -print -exec strip {} \;
 sudo strip ${RUBY_DESTDIR}/bin/ruby
 
