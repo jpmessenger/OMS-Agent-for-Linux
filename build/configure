@@ -419,8 +419,8 @@ ruby_configure_quals=(
     \"CFLAGS=${ruby_cflags}\"
     --disable-install-doc
     --disable-install-rdoc
-    --without-gmp
     --with-jemalloc
+    --without-gmp
     --with-out-ext=${RUBY_EXTENSIONS}
   )
 
