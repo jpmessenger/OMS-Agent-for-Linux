@@ -2,8 +2,7 @@ FROM centos:5
 MAINTAINER Abderrahmane Benbachir abderb@microsoft.com
 
 # Important for unittests
-RUN adduser omsagent
-RUN groupadd omiusers
+RUN adduser omsagent && groupadd omiusers
 
 RUN mkdir -p /home/scratch
 
@@ -18,6 +17,7 @@ RUN yum update -y && yum clean all && yum install -y wget epel-release
 # because Centos5 was deprecated
 RUN wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo
 RUN yum update -y && yum install -y devtoolset-2-gcc devtoolset-2-gcc-c++ devtoolset-2-binutils && scl enable devtoolset-2 bash && source /opt/rh/devtoolset-2/enable
+ENV PATH /opt/rh/devtoolset-2/root/usr/bin:$PATH
 
 RUN yum install -y which sudo make tree autoconf vim cmake zip git redhat-lsb openssh-clients bind-utils bison gcc-c++ libcxx libstdc++-static \
     rpm-devel pam-devel openssl-devel rpm-build mysql-devel curl-devel selinux-policy-devel audit-libs-devel boost148-devel jemalloc-devel
